@@ -64,7 +64,7 @@ int	send_message(pid_t pid_server, char *str)
 				signal = SIGUSR2;
 			if (kill(pid_server, signal) == -1)
 				return (-1);
-			usleep(2000);
+			usleep(1000);
 		}
 		str++;
 	}

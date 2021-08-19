@@ -77,7 +77,6 @@ int	main(int argc, char **argv)
 		{
 			signal(SIGUSR1, interpreter);
 			signal(SIGUSR2, interpreter);
-			usleep(1000);
 		}
 	}
 }
