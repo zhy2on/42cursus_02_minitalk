@@ -76,7 +76,6 @@ int	main(int argc, char **argv)
 {
 	pid_t	pid;
 
-	(void)argv;
 	if (argc != 1)
 	{
 		write(2, "Usage: ./server\n", 16);

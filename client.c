@@ -51,14 +51,17 @@ int	ft_atoi(const char *str)
 static int	send_ascii(pid_t pid, char c)
 {
 	int	bit;
+	int	ret;
 
 	bit = 7;
-	while (--bit > -1)
+	while (bit-- > 0)
 	{
 		if (c & (1 << bit))
-			kill(pid, SIGUSR1);
+			ret = kill(pid, SIGUSR1);
 		else
-			kill(pid, SIGUSR2);
+			ret = kill(pid, SIGUSR2);
+		if (ret == -1)
+			return (-1);
 		usleep(1000);
 	}
 	return (0);
@@ -71,15 +74,15 @@ static int	send_message(pid_t pid_server, char *str)
 	i = 0;
 	while (str[i] >= 32 && str[i] <= 126)
 	{
-		if (send_ascii(pid_server, str[i]))
-			return (1);
+		if (send_ascii(pid_server, str[i]) == -1)
+			return (-1);
 		i++;
 	}
 	i = 0;
 	while (i < 7)
 	{
 		if (kill(pid_server, SIGUSR1) == -1)
-			return (1);
+			return (-1);
 		usleep(1000);
 		i++;
 	}
@@ -96,7 +99,7 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	pid_server = ft_atoi(argv[1]);
-	if (send_message(pid_server, argv[2]))
+	if (send_message(pid_server, argv[2]) == -1)
 	{
 		write(2, "ERROR: Invalid server PID.\n", 27);
 		return (1);
