@@ -46,7 +46,7 @@ void	interpreter(int signo)
 
 	if (i++ < 7)
 	{
-		buf = buf << 1;
+		buf <<= 1;
 		if (signo == SIGUSR1)
 			buf += 1;
 	}
