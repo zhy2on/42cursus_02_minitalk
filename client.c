@@ -48,43 +48,24 @@ int	ft_atoi(const char *str)
 	return (sign * num);
 }
 
-static int	send_ascii(pid_t pid, char c)
+int	send_message(pid_t pid_server, char *str)
 {
 	int	bit;
-	int	ret;
+	int	signal;
 
-	bit = 7;
-	while (bit-- > 0)
+	while (*str)
 	{
-		if (c & (1 << bit))
-			ret = kill(pid, SIGUSR1);
-		else
-			ret = kill(pid, SIGUSR2);
-		if (ret == -1)
-			return (-1);
-		usleep(1000);
-	}
-	return (0);
-}
-
-static int	send_message(pid_t pid_server, char *str)
-{
-	int	i;
-
-	i = 0;
-	while (str[i] >= 32 && str[i] <= 126)
-	{
-		if (send_ascii(pid_server, str[i]) == -1)
-			return (-1);
-		i++;
-	}
-	i = 0;
-	while (i < 7)
-	{
-		if (kill(pid_server, SIGUSR1) == -1)
-			return (-1);
-		usleep(1000);
-		i++;
+		bit = 7;
+		while (bit-- > 0)
+		{
+			if ((*str >> bit) & 1)
+				signal = SIGUSR1;
+			else
+				signal = SIGUSR2;
+			if (kill(pid_server, signal) == -1)
+				return (-1);
+		}
+		str++;
 	}
 	return (0);
 }

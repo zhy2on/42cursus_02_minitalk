@@ -48,28 +48,21 @@ void	*ft_memset(void *b, int c, size_t len)
 
 void	interpreter(int signo)
 {
-	static size_t	i;
+	static int		flag;
 	static int		bit;
-	static char		buf[100];
+	static char		buf;
 
 	if (--bit == -1)
 	{
-		bit = 6;
-		++i;
+		bit = 7;
+		if (flag)
+			write(1, &buf, 1);
+		flag = 1;
+		buf = 0;
 	}
-	buf[i] &= ~(1 << 7);
-	if (signo == SIGUSR1)
-		buf[i] |= (1 << bit);
-	else if (signo == SIGUSR2)
-		buf[i] &= ~(1 << bit);
-	if (i == 99 || buf[i] == 127)
-	{
-		buf[i] = '\0';
-		write(1, buf, i + 1);
-		ft_memset(buf, '\0', 99);
-		i = 0;
-		bit = 0;
-	}
+	if (signo == SIGUSR1);
+		buf += 1;
+	buf = buf << 1;
 }
 
 int	main(int argc, char **argv)
@@ -87,7 +80,7 @@ int	main(int argc, char **argv)
 		write(1, "Server is launched! PID: ", 25);
 		ft_putnbr_fd(pid, 1);
 		ft_putchar_fd('\n', 1);
-		while (42)
+		while (1)
 		{
 			signal(SIGUSR1, interpreter);
 			signal(SIGUSR2, interpreter);
