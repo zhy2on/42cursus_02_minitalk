@@ -39,30 +39,23 @@ void	ft_putnbr_fd(int n, int fd)
 		ft_putchar_fd(nb + '0', fd);
 }
 
-void	*ft_memset(void *b, int c, size_t len)
-{
-	while (len)
-		((unsigned char *)b)[--len] = (unsigned char)c;
-	return (b);
-}
-
 void	interpreter(int signo)
 {
-	static int		flag;
-	static int		bit;
+	static int		i;
 	static char		buf;
 
-	if (--bit == -1)
+	if (i++ < 7)
 	{
-		bit = 7;
-		if (flag)
-			write(1, &buf, 1);
-		flag = 1;
-		buf = 0;
+		buf = buf << 1;
+		if (signo == SIGUSR1)
+			buf += 1;
 	}
-	if (signo == SIGUSR1);
-		buf += 1;
-	buf = buf << 1;
+	if (i == 7)
+	{
+		write(1, &buf, 1);
+		buf = 0;
+		i = 0;
+	}
 }
 
 int	main(int argc, char **argv)
@@ -84,6 +77,7 @@ int	main(int argc, char **argv)
 		{
 			signal(SIGUSR1, interpreter);
 			signal(SIGUSR2, interpreter);
+			usleep(1000);
 		}
 	}
 }
