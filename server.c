@@ -64,6 +64,7 @@ void	interpreter(int signo)
 			write(1, buf, j);
 			free(buf);
 			buf = NULL;
+			j = -1;
 		}
 		i = 0;
 		j++;
