@@ -39,7 +39,7 @@ int	send_message(pid_t pid_server, char *str)
 
 	while (*str)
 	{
-		bit = 7;
+		bit = 8;
 		while (bit-- > 0)
 		{
 			if ((*str >> bit) & 1)
@@ -48,9 +48,15 @@ int	send_message(pid_t pid_server, char *str)
 				signal = SIGUSR2;
 			if (kill(pid_server, signal) == -1)
 				return (-1);
-			usleep(1000);
+			usleep(10000);
 		}
 		str++;
+	}
+	while (bit++ < 8)
+	{
+		if (kill(pid_server, SIGUSR2) == -1)
+			return (-1);
+		usleep(10000);
 	}
 	return (0);
 }

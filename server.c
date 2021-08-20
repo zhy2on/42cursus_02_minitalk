@@ -12,6 +12,8 @@
 
 #include <unistd.h>
 #include <signal.h>
+#include <stdlib.h>
+#define	BUFF_SIZE 320
 
 void	ft_putchar_fd(char c, int fd)
 {
@@ -42,19 +44,29 @@ void	ft_putnbr_fd(int n, int fd)
 void	interpreter(int signo)
 {
 	static int		i;
-	static char		buf;
+	static int		j;
+	static char		*buf = NULL;
 
-	if (i++ < 7)
+	if (i++ < 8)
 	{
-		buf <<= 1;
+		if (!buf)
+			buf = (char*)malloc(sizeof(char) * (BUFF_SIZE + 1));
+		if (!buf)
+			return ;
+		buf[j] <<= 1;
 		if (signo == SIGUSR1)
-			buf += 1;
+			buf[j] += 1;
 	}
-	if (i == 7)
+	if (i == 8)
 	{
-		write(1, &buf, 1);
-		buf = 0;
+		if (buf[j] == '\0')
+		{
+			write(1, buf, j);
+			free(buf);
+			buf = NULL;
+		}
 		i = 0;
+		j++;
 	}
 }
 
@@ -79,4 +91,5 @@ int	main(int argc, char **argv)
 			signal(SIGUSR2, interpreter);
 		}
 	}
+	return (0);
 }
