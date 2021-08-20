@@ -56,19 +56,18 @@ void	interpreter(int signo)
 		buf[j] <<= 1;
 		if (signo == SIGUSR1)
 			buf[j] += 1;
+		if (i != 8)
+			return ;
 	}
-	if (i == 8)
+	if (buf[j] == '\0')
 	{
-		if (buf[j] == '\0')
-		{
-			write(1, buf, j);
-			free(buf);
-			buf = NULL;
-			j = -1;
-		}
-		i = 0;
-		j++;
+		write(1, buf, j);
+		free(buf);
+		buf = NULL;
+		j = -1;
 	}
+	i = 0;
+	j++;
 }
 
 int	main(int argc, char **argv)
