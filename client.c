@@ -52,7 +52,7 @@ int	send_message(pid_t pid_server, char *str)
 		}
 		str++;
 	}
-	while (bit++ < 8)
+	while (bit++ < 7)
 	{
 		if (kill(pid_server, SIGUSR2) == -1)
 			return (-1);

@@ -50,7 +50,7 @@ void	interpreter(int signo)
 	if (i++ < 8)
 	{
 		if (!buf)
-			buf = (char*)malloc(sizeof(char) * (BUFF_SIZE + 1));
+			buf = (char *)malloc(sizeof(char) * (BUFF_SIZE + 1));
 		if (!buf)
 			return ;
 		buf[j] <<= 1;
