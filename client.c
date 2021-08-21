@@ -10,41 +10,31 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <signal.h>
 #include <unistd.h>
+#include <signal.h>
+#include "utils.h"
+#include <stdio.h>
 
-int	ft_atoi(const char *str)
+void	sig_handler(int signo)
 {
-	unsigned int	num;
-	int				cnt;
-
-	num = 0;
-	cnt = 0;
-	while ((*str >= 9 && *str <= 13) || *str == 32)
-		str++;
-	while (*str >= '0' && *str <= '9')
-	{
-		num = num * 10 + (*str++ - '0');
-		cnt++;
-	}
-	if (cnt > 20)
-		return (-1);
-	return (num);
+	(void)signo;
+	usleep(1000);
+	return ;
 }
 
 int	send_pid(pid_t server_pid, pid_t client_pid)
 {
 	int	bit;
-	int	signal;
+	int	signo;
 
 	bit = 22;
 	while (bit-- > 0)
 	{
-		if ((server_pid >> bit) & 1)
-			signal = SIGUSR1;
+		if ((client_pid >> bit) & 1)
+			signo = SIGUSR1;
 		else
-			signal = SIGUSR2;
-		if (kill(server_pid, signal) == -1)
+			signo = SIGUSR2;
+		if (kill(server_pid, signo) == -1)
 			return (-1);
 		usleep(1000);
 	}
@@ -53,19 +43,20 @@ int	send_pid(pid_t server_pid, pid_t client_pid)
 
 int	send_char(pid_t server_pid, char c)
 {
-	int bit;
-	int	signal;
+	int	bit;
+	int	signo;
 
 	bit = 8;
 	while (bit-- > 0)
 	{
 		if ((c >> bit) & 1)
-			signal = SIGUSR1;
+			signo = SIGUSR1;
 		else
-			signal = SIGUSR2;
-		if (kill(server_pid, signal) == -1)
+			signo = SIGUSR2;
+		if (kill(server_pid, signo) == -1)
 			return (-1);
-		usleep(1000);
+		signal(SIGUSR1, sig_handler);
+		pause();
 	}
 	return (0);
 }
@@ -84,12 +75,18 @@ int	send_message(pid_t server_pid, char *str)
 
 int	main(int argc, char **argv)
 {
+	pid_t	server_pid;
+	pid_t	client_pid;
+
 	if (argc != 3)
 	{
 		write(2, "Usage: ./clinet [PID] [message]\n", 32);
 		return (1);
 	}
-	if (send_message(ft_atoi(argv[1]), argv[2]) == -1)
+	server_pid = ft_atoi(argv[1]);
+	client_pid = getpid();
+	if (send_pid(server_pid, client_pid) == -1
+		|| send_message(server_pid, argv[2]) == -1)
 	{
 		write(2, "ERROR: Invalid server PID.\n", 27);
 		return (1);

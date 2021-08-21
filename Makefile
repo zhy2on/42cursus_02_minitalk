@@ -15,27 +15,27 @@ CC = gcc
 CFLAGS = -Werror -Wall -Wextra
 
 SERVER = server
-SERVER_SRCS = server.o
+SERVER_OBJS = server.o utils.o
 
 CLIENT = client
-CLIENT_SRCS = client.o
+CLIENT_OBJS = client.o utils.o
 
 all : $(SERVER) $(CLIENT)
 
-$(CLIENT) : $(CLIENT_SRCS)
-	@$(CC) $(CLIENT_SRCS) -o $(CLIENT)
-
-$(SERVER) : $(SERVER_SRCS)
-	@$(CC) $(SERVER_SRCS) -o $(SERVER)
-
 %.o : %.c
-	@$(CC) $(FLAGS) $< -c
+	@$(CC) $(CFLAGS) -c $< -o $@
+
+$(CLIENT) : $(CLIENT_OBJS)
+	@$(CC) $(CLIENT_OBJS) -o $(CLIENT)
+
+$(SERVER) : $(SERVER_OBJS)
+	@$(CC) $(SERVER_OBJS) -o $(SERVER)
 
 clean :
-	@rm -f client.o server.o
+	@rm -rf $(CLIENT_OBJS) $(SERVER_OBJS)
 
 fclean : clean
-	@rm -f $(SERVER) $(CLIENT)
+	@rm -rf $(SERVER) $(CLIENT)
 
 re : fclean all
 
