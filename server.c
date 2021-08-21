@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include "utils.h"
 #include <stdio.h>
-#define	BUFF_SIZE 320
+#define	BUFF_SIZE 4095
 
 void	get_client_pid(pid_t *client_pid, int signo, int *flag)
 {
@@ -34,21 +34,27 @@ void	get_client_pid(pid_t *client_pid, int signo, int *flag)
 	}
 }
 
-void	sig_handler(int signo)
+int	receive_message_sub(int *i, int *j, char **buf)
 {
-	static int			flag;
-	static pid_t		client_pid;
-	static int			i;
-	static int			j;
-	static char			*buf = NULL;
-
-	if (!flag)
+	if ((*buf)[*j] == '\0')
 	{
-		get_client_pid(&client_pid, signo, &flag);
-		return ;
+		write(1, *buf, *j);
+		free(*buf);
+		*buf = NULL;
+		*j = -1;
+		return (1);
 	}
-	if (kill(client_pid, SIGUSR1) == -1)
-		write(1, "Client lost.\n", 13);
+	*i = 0;
+	*j += 1;
+	return (0);
+}
+
+void	receive_message(int signo, int *flag, pid_t *client_pid)
+{
+	static int	i;
+	static int	j;
+	static char	*buf;
+
 	if (i++ < 8)
 	{
 		if (!buf)
@@ -58,21 +64,29 @@ void	sig_handler(int signo)
 		buf[j] <<= 1;
 		if (signo == SIGUSR1)
 			buf[j] += 1;
-		if (i != 8)
-			return ;
 	}
-	if (buf[j] == '\0')
+	if (i == 8)
 	{
-		write(1, buf, j);
-		free(buf);
-		buf = NULL;
-		j = -1;
-		flag = 0;
-		client_pid = 0;
+		if (receive_message_sub(&i, &j, &buf))
+		{
+			*flag = 0;
+			*client_pid = 0;
+		}
 	}
-	i = 0;
-	j++;
-	
+}
+
+void	sig_handler(int signo)
+{
+	static int			flag;
+	static pid_t		client_pid;
+
+	if (!flag)
+	{
+		get_client_pid(&client_pid, signo, &flag);
+		return ;
+	}
+	kill(client_pid, SIGUSR1);
+	receive_message(signo, &flag, &client_pid);
 }
 
 int	main(int argc, char **argv)
