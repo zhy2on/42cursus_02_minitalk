@@ -32,7 +32,26 @@ int	ft_atoi(const char *str)
 	return (num);
 }
 
-int	send_message(pid_t pid_server, char *str)
+int	send_pid(pid_t server_pid, pid_t client_pid)
+{
+	int	bit;
+	int	signal;
+
+	bit = 22;
+	while (bit-- > 0)
+	{
+		if ((server_pid >> bit) & 1)
+			signal = SIGUSR1;
+		else
+			signal = SIGUSR2;
+		if (kill(server_pid, signal) == -1)
+			return (-1);
+		usleep(1000);
+	}
+	return (0);
+}
+
+int	send_message(pid_t server_pid, char *str)
 {
 	int	bit;
 	int	signal;
@@ -46,32 +65,29 @@ int	send_message(pid_t pid_server, char *str)
 				signal = SIGUSR1;
 			else
 				signal = SIGUSR2;
-			if (kill(pid_server, signal) == -1)
+			if (kill(server_pid, signal) == -1)
 				return (-1);
-			usleep(10000);
+			usleep(1000);
 		}
 		str++;
 	}
 	while (bit++ < 7)
 	{
-		if (kill(pid_server, SIGUSR2) == -1)
+		if (kill(server_pid, SIGUSR2) == -1)
 			return (-1);
-		usleep(10000);
+		usleep(1000);
 	}
 	return (0);
 }
 
 int	main(int argc, char **argv)
 {
-	int	pid_server;
-
 	if (argc != 3)
 	{
 		write(2, "Usage: ./clinet [PID] [message]\n", 32);
 		return (1);
 	}
-	pid_server = ft_atoi(argv[1]);
-	if (send_message(pid_server, argv[2]) == -1)
+	if (send_message(ft_atoi(argv[1]), argv[2]) == -1)
 	{
 		write(2, "ERROR: Invalid server PID.\n", 27);
 		return (1);

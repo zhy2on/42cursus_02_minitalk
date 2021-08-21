@@ -72,7 +72,7 @@ void	interpreter(int signo)
 
 int	main(int argc, char **argv)
 {
-	pid_t	pid;
+	pid_t	server_pid;
 
 	if (argc != 1)
 	{
@@ -81,15 +81,14 @@ int	main(int argc, char **argv)
 	}
 	else
 	{
-		pid = getpid();
+		server_pid = getpid();
 		write(1, "Server is launched! PID: ", 25);
-		ft_putnbr_fd(pid, 1);
+		ft_putnbr_fd(server_pid, 1);
 		ft_putchar_fd('\n', 1);
+		signal(SIGUSR1, interpreter);
+		signal(SIGUSR2, interpreter);
 		while (1)
-		{
-			signal(SIGUSR1, interpreter);
-			signal(SIGUSR2, interpreter);
-		}
+			pause();
 	}
 	return (0);
 }
