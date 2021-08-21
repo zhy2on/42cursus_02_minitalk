@@ -51,32 +51,34 @@ int	send_pid(pid_t server_pid, pid_t client_pid)
 	return (0);
 }
 
-int	send_message(pid_t server_pid, char *str)
+int	send_char(pid_t server_pid, char c)
 {
-	int	bit;
+	int bit;
 	int	signal;
 
-	while (*str)
+	bit = 8;
+	while (bit-- > 0)
 	{
-		bit = 8;
-		while (bit-- > 0)
-		{
-			if ((*str >> bit) & 1)
-				signal = SIGUSR1;
-			else
-				signal = SIGUSR2;
-			if (kill(server_pid, signal) == -1)
-				return (-1);
-			usleep(1000);
-		}
-		str++;
-	}
-	while (bit++ < 7)
-	{
-		if (kill(server_pid, SIGUSR2) == -1)
+		if ((c >> bit) & 1)
+			signal = SIGUSR1;
+		else
+			signal = SIGUSR2;
+		if (kill(server_pid, signal) == -1)
 			return (-1);
 		usleep(1000);
 	}
+	return (0);
+}
+
+int	send_message(pid_t server_pid, char *str)
+{
+	while (*str)
+	{
+		if (send_char(server_pid, *str++) == -1)
+			return (-1);
+	}
+	if (send_char(server_pid, '\0') == -1)
+		return (-1);
 	return (0);
 }
 

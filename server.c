@@ -41,12 +41,47 @@ void	ft_putnbr_fd(int n, int fd)
 		ft_putchar_fd(nb + '0', fd);
 }
 
-void	interpreter(int signo)
+int	send_ack(int client_pid, int signo)
 {
+	if (signo == SIGUSR1)
+		kill(client_pid, SIGUSR1);
+	else if (signo == SIGUSR2)
+		kill(client_pid, SIGUSR2);
+	else
+	{
+		write(2, "Invalid signal\n", 15);
+		return (-1);
+	}
+	return (0);
+}
+
+void	sig_handler(int signo)
+{
+	static int		flag;
+	static int		client_pid;
 	static int		i;
 	static int		j;
 	static char		*buf = NULL;
 
+/*
+	if (!flag)
+	{
+		if (i++ < 22)
+		{
+			client_pid <<= 1;
+			if (signo == SIGUSR1)
+				client_pid += 1;
+		}
+		if (i == 22)
+		{
+			flag = 1;
+			i = 0;
+		}
+		return ;
+	}
+	if (send_ack(client_pid, signo) == -1)
+		return ;
+		*/
 	if (i++ < 8)
 	{
 		if (!buf)
@@ -73,6 +108,7 @@ void	interpreter(int signo)
 int	main(int argc, char **argv)
 {
 	pid_t	server_pid;
+	pid_t	client_pid;
 
 	if (argc != 1)
 	{
@@ -81,12 +117,13 @@ int	main(int argc, char **argv)
 	}
 	else
 	{
+		client_pid = 0;
 		server_pid = getpid();
 		write(1, "Server is launched! PID: ", 25);
 		ft_putnbr_fd(server_pid, 1);
 		ft_putchar_fd('\n', 1);
-		signal(SIGUSR1, interpreter);
-		signal(SIGUSR2, interpreter);
+		signal(SIGUSR1, sig_handler);
+		signal(SIGUSR2, sig_handler);
 		while (1)
 			pause();
 	}
