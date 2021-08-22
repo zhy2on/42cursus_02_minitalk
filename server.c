@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
 #include <unistd.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -88,12 +87,12 @@ void	sig_handler(int signo)
 		get_client_pid(&client_pid, signo, &flag);
 		return ;
 	}
-	if (kill(client_pid, SIGUSR1) == -1)
+	receive_message(signo, &flag, &client_pid);
+	if (flag && kill(client_pid, SIGUSR1) == -1)
 	{
-		write(2, "Error: Client lost.\n", 20);
+		write(2, "Error: Client lost\n", 19);
 		return ;
 	}
-	receive_message(signo, &flag, &client_pid);
 }
 
 int	main(int argc, char **argv)
