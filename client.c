@@ -12,16 +12,20 @@
 
 #include <unistd.h>
 #include <signal.h>
+#include <stdlib.h>
 #include "utils.h"
+#include <stdio.h>
 
 void	sig_handler(int signo)
 {
 	(void)signo;
-	usleep(1000);
-	return ;
+	if (signo != SIGUSR1)
+	{
+		write(2, "Error: Invalid ACK Code.\n", 25);
+	}
 }
 
-int	send_pid(pid_t server_pid, pid_t client_pid)
+void	send_pid(pid_t server_pid, pid_t client_pid)
 {
 	int	bit;
 	int	signo;
@@ -34,13 +38,15 @@ int	send_pid(pid_t server_pid, pid_t client_pid)
 		else
 			signo = SIGUSR2;
 		if (kill(server_pid, signo) == -1)
-			return (-1);
-		usleep(1000);
+		{
+			write(2, "Error: Invalid server PID.\n", 27);
+			exit(1);
+		}
+		usleep(10000);
 	}
-	return (0);
 }
 
-int	send_char(pid_t server_pid, char c)
+void	send_char(pid_t server_pid, char c)
 {
 	int	bit;
 	int	signo;
@@ -53,29 +59,22 @@ int	send_char(pid_t server_pid, char c)
 		else
 			signo = SIGUSR2;
 		if (kill(server_pid, signo) == -1)
-			return (-1);
+		{
+			write(2, "Error: Invalid server PID.\n", 27);
+			exit(1);
+		}
 		signal(SIGUSR1, sig_handler);
-		pause();
+		if (!usleep(10000))
+		{
+			write(2, "Time Out.\n", 10);
+			exit(1);
+		}
 	}
-	return (0);
-}
-
-int	send_message(pid_t server_pid, char *str)
-{
-	while (*str)
-	{
-		if (send_char(server_pid, *str++) == -1)
-			return (-1);
-	}
-	if (send_char(server_pid, '\0') == -1)
-		return (-1);
-	return (0);
 }
 
 int	main(int argc, char **argv)
 {
 	pid_t	server_pid;
-	pid_t	client_pid;
 
 	if (argc != 3)
 	{
@@ -83,13 +82,10 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	server_pid = ft_atoi(argv[1]);
-	client_pid = getpid();
-	if (send_pid(server_pid, client_pid) == -1
-		|| send_message(server_pid, argv[2]) == -1)
-	{
-		write(2, "ERROR: Invalid server PID.\n", 27);
-		return (1);
-	}
+	send_pid(server_pid, getpid());
+	while (*argv[2])
+		send_char(server_pid, *argv[2]++);
+	send_char(server_pid, '\0');
 	write(1, "Message sent successfully :)\n", 29);
 	return (0);
 }
