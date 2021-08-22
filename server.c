@@ -14,7 +14,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include "utils.h"
-#define	BUFF_SIZE 4095
+#define	BUFF_SIZE 42
 
 void	get_client_pid(pid_t *client_pid, int signo, int *flag)
 {
@@ -55,14 +55,12 @@ void	receive_message(int signo, int *flag, pid_t *client_pid)
 {
 	static int	i;
 	static int	j;
-	static char	*buf;
+	static char	*buf = NULL;
 
+	if (!i && !(j % BUFF_SIZE))
+		buf = ft_buf_alloc(buf, j, BUFF_SIZE);
 	if (i++ < 8)
 	{
-		if (!buf)
-			buf = (char *)malloc(sizeof(char) * (BUFF_SIZE + 1));
-		if (!buf)
-			return ;
 		buf[j] <<= 1;
 		if (signo == SIGUSR1)
 			buf[j] += 1;
@@ -88,7 +86,7 @@ void	sig_handler(int signo)
 		return ;
 	}
 	receive_message(signo, &flag, &client_pid);
-	if (flag && kill(client_pid, signo) == -1)
+	if (flag && kill(client_pid, SIGUSR1) == -1)
 	{
 		write(2, "Error: Client lost\n", 19);
 		exit (1);

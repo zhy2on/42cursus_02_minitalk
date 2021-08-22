@@ -10,7 +10,27 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <stdio.h>
+
 #include <unistd.h>
+#include <stdlib.h>
+
+char	*ft_buf_alloc(char *buf, int idx, int buff_size)
+{
+	static char	*new_buf;
+
+	new_buf = (char *)malloc(sizeof(char) * ((idx / buff_size + 1) * buff_size));
+	if (!new_buf)
+	{
+		write(1, "Error: Fail to buffer allocation\n", 33);
+		free(buf);
+		exit(1);
+	}
+	while (--idx >= 0)
+		new_buf[idx] = buf[idx];
+	free(buf);
+	return (new_buf);
+}
 
 int	ft_atoi(const char *str)
 {

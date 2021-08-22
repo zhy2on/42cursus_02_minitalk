@@ -20,7 +20,7 @@ void	sig_handler(int signo)
 	(void)signo;
 	if (signo != SIGUSR1)
 	{
-		write(2, "Error: Invalid ACK code\n", 24);
+		write(2, "Error: Invalid ack code\n", 24);
 		exit(1);
 	}
 }
