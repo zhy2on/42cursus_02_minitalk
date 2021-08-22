@@ -18,11 +18,6 @@
 void	sig_handler(int signo)
 {
 	(void)signo;
-	if (signo != SIGUSR1)
-	{
-		write(2, "Error: Invalid ack code\n", 24);
-		exit(1);
-	}
 }
 
 void	send_pid(pid_t server_pid, pid_t client_pid)
@@ -54,6 +49,7 @@ void	send_message(pid_t server_pid, char c)
 	bit = 8;
 	while (bit-- > 0)
 	{
+		signal(SIGUSR1, sig_handler);
 		if ((c >> bit) & 1)
 			signo = SIGUSR1;
 		else
@@ -63,12 +59,11 @@ void	send_message(pid_t server_pid, char c)
 			write(2, "Error: Invalid server PID\n", 26);
 			exit(1);
 		}
-		signal(SIGUSR1, sig_handler);
 		if (c || bit)
 		{
-			if (!usleep(10000))
+			if (!sleep(3))
 			{
-				write(1, "Error: Time out\n", 16);
+				write(2, "Error: Time out\n", 16);
 				exit(1);
 			}
 		}
@@ -89,6 +84,7 @@ int	main(int argc, char **argv)
 	while (*argv[2])
 		send_message(server_pid, *argv[2]++);
 	send_message(server_pid, '\0');
+	usleep(100);
 	write(1, "Message sent successfully\n", 26);
 	return (0);
 }

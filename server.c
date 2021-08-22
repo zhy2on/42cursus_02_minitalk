@@ -14,7 +14,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include "utils.h"
-#define	BUFF_SIZE 42
+#define	BUFF_SIZE 420
 
 void	get_client_pid(pid_t *client_pid, int signo, int *flag)
 {
@@ -85,8 +85,9 @@ void	sig_handler(int signo)
 		get_client_pid(&client_pid, signo, &flag);
 		return ;
 	}
+	usleep(30);
 	receive_message(signo, &flag, &client_pid);
-	if (flag && kill(client_pid, SIGUSR1) == -1)
+	if (client_pid && kill(client_pid, SIGUSR1) == -1)
 	{
 		write(2, "Error: Client lost\n", 19);
 		exit (1);

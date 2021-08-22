@@ -10,14 +10,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-
 #include <unistd.h>
 #include <stdlib.h>
 
 char	*ft_buf_alloc(char *buf, int idx, int buff_size)
 {
-	static char	*new_buf;
+	char	*new_buf;
 
 	new_buf = (char *)malloc(sizeof(char) * ((idx / buff_size + 1) * buff_size));
 	if (!new_buf)
