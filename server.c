@@ -14,12 +14,11 @@
 #include <signal.h>
 #include <stdlib.h>
 #include "utils.h"
-#include <stdio.h>
 #define	BUFF_SIZE 4095
 
 void	get_client_pid(pid_t *client_pid, int signo, int *flag)
 {
-	static int i;
+	static int	i;
 
 	if (i++ < 22)
 	{
@@ -36,17 +35,20 @@ void	get_client_pid(pid_t *client_pid, int signo, int *flag)
 
 int	receive_message_sub(int *i, int *j, char **buf)
 {
+	int	ret;
+
+	ret = 0;
 	if ((*buf)[*j] == '\0')
 	{
 		write(1, *buf, *j);
 		free(*buf);
 		*buf = NULL;
 		*j = -1;
-		return (1);
+		ret = 1;
 	}
 	*i = 0;
 	*j += 1;
-	return (0);
+	return (ret);
 }
 
 void	receive_message(int signo, int *flag, pid_t *client_pid)

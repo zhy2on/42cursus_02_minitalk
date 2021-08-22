@@ -13,7 +13,6 @@
 #include <unistd.h>
 #include <signal.h>
 #include "utils.h"
-#include <stdio.h>
 
 void	sig_handler(int signo)
 {
