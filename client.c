@@ -20,7 +20,7 @@ void	sig_handler(int signo)
 	(void)signo;
 	if (signo != SIGUSR1)
 	{
-		write(2, "Error: Invalid ACK Code\n", 24);
+		write(2, "Error: Invalid ACK code\n", 24);
 		exit(1);
 	}
 }
@@ -64,14 +64,14 @@ void	send_message(pid_t server_pid, char c)
 			exit(1);
 		}
 		signal(SIGUSR1, sig_handler);
-		usleep(10000);
-		/*
-		if (!usleep(10000))
+		if (c || bit)
 		{
-			write(2, "Error: Time out\n", 16);
-			exit(1);
+			if (!usleep(10000))
+			{
+				write(1, "Error: Time out\n", 16);
+				exit(1);
+			}
 		}
-		*/
 	}
 }
 

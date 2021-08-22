@@ -88,10 +88,10 @@ void	sig_handler(int signo)
 		return ;
 	}
 	receive_message(signo, &flag, &client_pid);
-	if (flag && kill(client_pid, SIGUSR1) == -1)
+	if (flag && kill(client_pid, signo) == -1)
 	{
 		write(2, "Error: Client lost\n", 19);
-		return ;
+		exit (1);
 	}
 }
 
