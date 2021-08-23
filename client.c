@@ -102,7 +102,7 @@ int	main(int argc, char **argv)
 	while (*argv[2])
 		send_message(server_pid, *argv[2]++);
 	send_message(server_pid, '\0');
-	usleep(100);
+	usleep(1000);
 	write(1, "Message sent successfully\n", 26);
 	return (0);
 }
