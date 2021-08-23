@@ -30,25 +30,6 @@ char	*ft_buf_alloc(char *buf, int idx, int buff_size)
 	return (new_buf);
 }
 
-int	ft_atoi(const char *str)
-{
-	unsigned int	num;
-	int				cnt;
-
-	num = 0;
-	cnt = 0;
-	while ((*str >= 9 && *str <= 13) || *str == 32)
-		str++;
-	while (*str >= '0' && *str <= '9')
-	{
-		num = num * 10 + (*str++ - '0');
-		cnt++;
-	}
-	if (cnt > 20)
-		return (-1);
-	return (num);
-}
-
 void	ft_putchar_fd(char c, int fd)
 {
 	if (fd < 0)

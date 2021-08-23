@@ -13,7 +13,25 @@
 #include <unistd.h>
 #include <signal.h>
 #include <stdlib.h>
-#include "utils.h"
+
+int	ft_atoi(const char *str)
+{
+	unsigned int	num;
+	int				cnt;
+
+	num = 0;
+	cnt = 0;
+	while ((*str >= 9 && *str <= 13) || *str == 32)
+		str++;
+	while (*str >= '0' && *str <= '9')
+	{
+		num = num * 10 + (*str++ - '0');
+		cnt++;
+	}
+	if (cnt > 20)
+		return (-1);
+	return (num);
+}
 
 void	sig_handler(int signo)
 {
@@ -37,7 +55,7 @@ void	send_pid(pid_t server_pid, pid_t client_pid)
 			write(2, "Error: Invalid server PID\n", 26);
 			exit(1);
 		}
-		usleep(50);
+		usleep(10000);
 	}
 }
 
@@ -49,7 +67,6 @@ void	send_message(pid_t server_pid, char c)
 	bit = 8;
 	while (bit-- > 0)
 	{
-		signal(SIGUSR1, sig_handler);
 		if ((c >> bit) & 1)
 			signo = SIGUSR1;
 		else
@@ -61,7 +78,7 @@ void	send_message(pid_t server_pid, char c)
 		}
 		if (c || bit)
 		{
-			if (!sleep(3))
+			if (!usleep(100000))
 			{
 				write(2, "Error: Time out\n", 16);
 				exit(1);
@@ -74,6 +91,7 @@ int	main(int argc, char **argv)
 {
 	pid_t	server_pid;
 
+	signal(SIGUSR1, sig_handler);
 	if (argc != 3)
 	{
 		write(2, "Usage: ./clinet [PID] [message]\n", 32);

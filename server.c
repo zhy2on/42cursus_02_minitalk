@@ -85,7 +85,6 @@ void	sig_handler(int signo)
 		get_client_pid(&client_pid, signo, &flag);
 		return ;
 	}
-	usleep(30);
 	receive_message(signo, &flag, &client_pid);
 	if (client_pid && kill(client_pid, SIGUSR1) == -1)
 	{
