@@ -6,18 +6,18 @@
 /*   By: jihoh <jihoh@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/18 19:24:14 by jihoh             #+#    #+#             */
-/*   Updated: 2021/08/21 21:42:07 by jihoh            ###   ########.fr       */
+/*   Updated: 2021/08/24 15:00:56 by jihoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
 #include <stdlib.h>
 
-char	*ft_buf_alloc(char *buf, int idx, int buff_size)
+char	*ft_buf_alloc(char *buf, int idx, int size)
 {
 	char	*new_buf;
 
-	new_buf = (char *)malloc(sizeof(char) * ((idx / buff_size + 1) * buff_size));
+	new_buf = (char *)malloc(sizeof(char) * ((idx / size + 1) * size));
 	if (!new_buf)
 	{
 		write(1, "Error: Fail to buffer allocation\n", 33);
